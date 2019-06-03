@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ConfigMgr xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ILCP>None</ILCP>
+  <ILThresholdCP>None</ILThresholdCP>
+  <LRACP>None</LRACP>
+  <LRThresholdCP>None</LRThresholdCP>
+  <LRALowCP>None</LRALowCP>
+  <LRAHighCP>None</LRAHighCP>
+  <PeakCP>None</PeakCP>
+  <AverageCP>None</AverageCP>
+  <CurrentCP>None</CurrentCP>
+</ConfigMgr>
