@@ -5,3 +5,5 @@ BETA 1.2: Added a settings panel which allows you to select which Custom Tags to
 BETA 1.3: Added the ability to calculate and tag the current loudness (IL + Track Gain) of selected tracks. Added tagging options for both the "Current Loudness" (required) and "Average Songs" (optional) features.
 
 BETA 1.3.2: Fixes for localization errors. Fixes for index exception.
+
+BETA 1.3.3: Fixes for localization errors. Fixes for null reference exception.

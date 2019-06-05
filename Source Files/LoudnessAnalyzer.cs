@@ -5,15 +5,14 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 
 namespace MusicBeePlugin
 {
 
     public partial class Plugin
     {
-
-        CultureInfo culture;
-        NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+        
 
         private MusicBeeApiInterface mbApiInterface;
         private PluginInfo about = new PluginInfo();
@@ -45,14 +44,6 @@ namespace MusicBeePlugin
 
             _workingDirectory = mbApiInterface.Setting_GetPersistentStoragePath() + @"Dependencies\";
             _fileDirectory = mbApiInterface.Setting_GetPersistentStoragePath() + @"Dependencies\LoudnessTextFiles\";
-
-            culture = CultureInfo.CreateSpecificCulture("en-US");
-
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-
-            //Thread.CurrentThread.CurrentCulture = culture;
-            //Thread.CurrentThread.CurrentUICulture = culture;
 
 
             return about;
@@ -383,6 +374,10 @@ namespace MusicBeePlugin
         public void GetCurrentLoudness()
         {
 
+            string tempculture = Thread.CurrentThread.CurrentCulture.Name;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
+
             string temp, check = null;
             MetaDataType tag, tag2;
 
@@ -422,8 +417,7 @@ namespace MusicBeePlugin
                 // Add regex to remove non-numeric characters from tags.
                 string taggedVal = Regex.Replace(mbApiInterface.Library_GetFileTag(files[i], tag), @"[a-zA-Z /\s/g :]", "");
                 string gainVal = Regex.Replace(mbApiInterface.Library_GetFileProperty(files[i], FilePropertyType.ReplayGainTrack), @"[a-zA-Z /\s/g :]", "");
-
-                //gainVal = Convert.ToString(gainVal, nfi);
+                
                 gainVal = Regex.Replace(gainVal, ",", ".");
             
                 //MessageBox.Show("Tagged Value: " + taggedVal + "\nGain Value: " + gainVal);
@@ -439,7 +433,7 @@ namespace MusicBeePlugin
                 catch (System.FormatException e)
                 {
 
-                    MessageBox.Show("Please tag all of the files first! \n " + e);
+                    MessageBox.Show("Please tag all of the files first! \n ");
                     return;
 
                 }
@@ -451,6 +445,9 @@ namespace MusicBeePlugin
             mbApiInterface.MB_RefreshPanels();
 
             MessageBox.Show("Files tagged.");
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(tempculture);
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture(tempculture);
 
             return;
 
