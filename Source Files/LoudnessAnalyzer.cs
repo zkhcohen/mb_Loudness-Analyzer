@@ -13,6 +13,7 @@ namespace MusicBeePlugin
     {
 
         CultureInfo culture;
+        NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
 
         private MusicBeeApiInterface mbApiInterface;
         private PluginInfo about = new PluginInfo();
@@ -21,9 +22,8 @@ namespace MusicBeePlugin
         //private Control panel;
         //public int panelHeight;
         string [] data = new string[7];
-        string [] files = null;
+        public string[] files;
 
-        NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
 
         public PluginInfo Initialise(IntPtr apiInterfacePtr)
         {
@@ -37,7 +37,7 @@ namespace MusicBeePlugin
             about.Type = PluginType.General;
             about.VersionMajor = 1;  // your plugin version
             about.VersionMinor = 3;
-            about.Revision = 2;
+            about.Revision = 3;
             about.MinInterfaceVersion = MinInterfaceVersion;
             about.MinApiRevision = MinApiRevision;
             about.ReceiveNotifications = (ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents);
@@ -85,27 +85,6 @@ namespace MusicBeePlugin
         }
         
 
-        public string CurrentTitle(int currentSong)
-        {
-
-
-            var rawTitle = mbApiInterface.Library_GetFileTag(files[currentSong], MetaDataType.TrackTitle) + "-" +
-                       mbApiInterface.Library_GetFileTag(files[currentSong], MetaDataType.Artist) + "-" +
-                       mbApiInterface.Library_GetFileProperty(files[currentSong], FilePropertyType.Kind) + "-" +
-                       mbApiInterface.Library_GetFileProperty(files[currentSong], FilePropertyType.Duration);
-
-
-
-            var processedTitle = Regex.Replace(rawTitle, @"[ / : * % ? < > | ! ]", "");
-            processedTitle = processedTitle.Replace("\"", "");
-            
-
-            return processedTitle;
-
-        }
-
-
-
         // receive event notifications from MusicBee
         // you need to set about.ReceiveNotificationFlags = PlayerEvents to receive all notifications, and not just the startup event
         public void ReceiveNotification(string sourceFileUrl, NotificationType type)
@@ -132,13 +111,14 @@ namespace MusicBeePlugin
         {
 
             MessageBox.Show("Tagging selected files...");
+            files = null;
             TagFiles();
 
         }
 
         private void menu2_Click(object sender, System.EventArgs e)
         {
-
+            files = null;
             AverageFiles();
 
         }
@@ -245,6 +225,8 @@ namespace MusicBeePlugin
             Dictionary<int, string> DeserializedDict = configMgr.DeserializeIntoDict(_workingDirectory + @"\DRconfig.xml", new Dictionary<int, string>());
 
             int I = 0;
+
+           
 
             using (var reader = new StreamReader(_fileDirectory + CurrentTitle(currentSong) + ".txt"))
             {
@@ -391,8 +373,7 @@ namespace MusicBeePlugin
             mbApiInterface.MB_RefreshPanels();
 
             MessageBox.Show("[FILES TAGGED] \n\nAverage DR of selected files: " + Convert.ToString(Math.Round(avg, 2)) + " LU");
-
-            files = null;
+            
 
             return; 
             
@@ -511,7 +492,7 @@ namespace MusicBeePlugin
                 {
 
                     ParseValues(i);
-                    //MessageBox.Show("C: " + _checkNum + "\nS: " + _selectedNum);
+                   // MessageBox.Show("C: " + _checkNum + "\nS: " + _selectedNum);
 
                 }
                 
@@ -520,12 +501,32 @@ namespace MusicBeePlugin
 
             mbApiInterface.MB_RefreshPanels();
 
-            files = null;
-
             return true;
         }
 
-        
+
+        public string CurrentTitle(int currentSong)
+        {
+
+            //MessageBox.Show("Current Song: " + currentSong);
+            //MessageBox.Show("Array Length: " + files.Length);
+
+            var rawTitle = mbApiInterface.Library_GetFileTag(files[currentSong], MetaDataType.TrackTitle) + "-" +
+                       mbApiInterface.Library_GetFileTag(files[currentSong], MetaDataType.Artist) + "-" +
+                       mbApiInterface.Library_GetFileProperty(files[currentSong], FilePropertyType.Kind) + "-" +
+                       mbApiInterface.Library_GetFileProperty(files[currentSong], FilePropertyType.Duration);
+
+
+
+            var processedTitle = Regex.Replace(rawTitle, @"[ / : * % ? < > | ! ]", "");
+            processedTitle = processedTitle.Replace("\"", "");
+
+
+            return processedTitle;
+
+        }
+
+
 
     }
     
