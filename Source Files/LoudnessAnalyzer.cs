@@ -36,7 +36,7 @@ namespace MusicBeePlugin
             about.Type = PluginType.General;
             about.VersionMajor = 1;  // your plugin version
             about.VersionMinor = 3;
-            about.Revision = 3;
+            about.Revision = 4;
             about.MinInterfaceVersion = MinInterfaceVersion;
             about.MinApiRevision = MinApiRevision;
             about.ReceiveNotifications = (ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents);
@@ -325,7 +325,7 @@ namespace MusicBeePlugin
                 try
                 {
                     
-                    avg += Convert.ToDouble(Regex.Replace(taggedVal, @"[a-zA-Z /\s/g :]", ""));
+                    avg += Convert.ToDouble(Regex.Replace(taggedVal, @"[a-zA-Z /\s/g :]", ""), CultureInfo.GetCultureInfo("en-us"));
 
                 }
                 catch (System.FormatException e)
@@ -374,9 +374,9 @@ namespace MusicBeePlugin
         public void GetCurrentLoudness()
         {
 
-            string tempculture = Thread.CurrentThread.CurrentCulture.Name;
-            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
+            //string tempculture = Thread.CurrentThread.CurrentCulture.Name;
+            //Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+            //Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
             string temp, check = null;
             MetaDataType tag, tag2;
@@ -417,14 +417,18 @@ namespace MusicBeePlugin
                 // Add regex to remove non-numeric characters from tags.
                 string taggedVal = Regex.Replace(mbApiInterface.Library_GetFileTag(files[i], tag), @"[a-zA-Z /\s/g :]", "");
                 string gainVal = Regex.Replace(mbApiInterface.Library_GetFileProperty(files[i], FilePropertyType.ReplayGainTrack), @"[a-zA-Z /\s/g :]", "");
-                
-                gainVal = Regex.Replace(gainVal, ",", ".");
-            
+
+                Convert.ToString(gainVal, CultureInfo.GetCultureInfo("en-us"));
+
+                //gainVal = Regex.Replace(gainVal, ",", ".");
+
                 //MessageBox.Show("Tagged Value: " + taggedVal + "\nGain Value: " + gainVal);
 
                 try
                 {
-                    double cur = Convert.ToDouble(taggedVal) + Convert.ToDouble(gainVal);
+                    double cur = Convert.ToDouble(taggedVal, CultureInfo.GetCultureInfo("en-us")) + Convert.ToDouble(gainVal);
+
+                    //MessageBox.Show("CUR: " + cur);
 
                     mbApiInterface.Library_SetFileTag(files[i], tag2, Math.Round(cur, 2) + " LUFS");
                     mbApiInterface.Library_CommitTagsToFile(files[i]);
@@ -446,8 +450,8 @@ namespace MusicBeePlugin
 
             MessageBox.Show("Files tagged.");
 
-            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(tempculture);
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture(tempculture);
+            //Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture(tempculture);
+            //Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture(tempculture);
 
             return;
 
